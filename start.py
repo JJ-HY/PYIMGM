@@ -46,21 +46,21 @@ def remove_background():
         label.image = img_tk
         
         # 결과 이미지 저장
-        output_path = label.file_path.rsplit('.', 1)[0] + '_nobg.png'
-        output_image.save(output_path)
-        label.file_path = output_path
+        # output_path = label.file_path.rsplit('.', 1)[0] + '_nobg.png'
+        # output_image.save(output_path)
+        # label.file_path = output_path
         
-        print(f"배경이 제거된 이미지가 저장되었습니다: {output_path}")
+        # print(f"배경이 제거된 이미지가 저장되었습니다: {output_path}")
 
 root = tk.Tk()
-root.title("로컬 배경 제거 이미지 뷰어")
+root.title("PYIMGM")
 root.geometry("500x550+500+150")
 
 open_button = tk.Button(root, text="이미지 열기", command=open_image)
 open_button.pack()
 
 remove_bg_button = tk.Button(root, text="배경 제거", command=remove_background)
-remove_bg_button.pack()
+remove_bg_button.place(x=220, y=500)
 
 label = tk.Label(root)
 label.pack()
