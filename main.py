@@ -4,7 +4,9 @@ from PIL import Image, ImageTk
 import io
 import bg_remove
 import contour_find
-
+import gif_bg_remove
+import size_change
+import arrange_img
 
 def dummy_function():
     pass
@@ -22,9 +24,9 @@ root.grid_columnconfigure(4, weight=1)
 buttons = [
     tk.Button(root, text="이미지 배경 투명화", command=lambda: bg_remove.open_bg_remove(root), width=20, height=2),
     tk.Button(root, text="이미지 외곽선 추출", command=lambda: contour_find.open_contour_find(root), width = 20, height= 2),
-    tk.Button(root, text="GIF 배경 투명화", command=dummy_function, width = 20, height= 2),
-    tk.Button(root, text="이미지 사이즈 변환", command=dummy_function, width = 20, height= 2),
-    tk.Button(root, text="다수 이미지 정렬", command=dummy_function, width = 20, height= 2),
+    tk.Button(root, text="GIF 배경 투명화", command=lambda: gif_bg_remove.open_gif_transparent(root), width = 20, height= 2),
+    tk.Button(root, text="이미지 사이즈 변환", command=lambda: size_change.open_size_change(root), width = 20, height= 2),
+    tk.Button(root, text="다수 이미지 정렬", command=lambda: arrange_img.open_multiple_images(root), width = 20, height= 2),
     tk.Button(root, text="다수 이미지 합성", command=dummy_function, width = 20, height= 2),
     tk.Button(root, text="영상 GIF 변환", command=dummy_function, width = 20, height= 2),
     tk.Button(root, text="종료", command=root.quit, width = 10, height= 1)

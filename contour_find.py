@@ -1,11 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog, Toplevel
 from PIL import Image, ImageTk
-from rembg import remove
-import io
 import cv2
 import numpy as np
-
 
 def open_contour_find(root):
     new_window = Toplevel(root)
@@ -15,15 +12,15 @@ def open_contour_find(root):
     title_label = tk.Label(new_window, text="이미지 외곽선 추출", font=("bold", 10))
     title_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
 
-    # 새 창의 레이아웃을 설정 (grid 사용)
     new_window.grid_rowconfigure(0, weight=0)  # 제목
     new_window.grid_rowconfigure(1, weight=1)  # 이미지가 중간에 위치
     new_window.grid_rowconfigure(2, weight=0)  # 버튼이 하단에 위치
     new_window.grid_columnconfigure(0, weight=1)  # 버튼과 이미지 중앙 정렬
 
-    # 이미지 라벨을 새 창에서 초기화 (이미지가 표시될 자리)
     img_label = tk.Label(new_window)
     img_label.grid(row=1, column=0, padx=20, pady=20)  # 이미지를 중간에 표시
+
+    contour_image_full = None  # 원본 크기의 외곽선 이미지를 저장할 변수
 
     def open_image():
         file_path = filedialog.askopenfilename(parent=new_window, filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")])
@@ -33,7 +30,7 @@ def open_contour_find(root):
     def load_image(file_path):
         # 원본 이미지 로드 및 표시
         img = Image.open(file_path)
-        img.thumbnail((300, 300))
+        img.thumbnail((300, 300))  # 300x300 크기로 축소하여 표시
         img_tk = ImageTk.PhotoImage(img)
         img_label.config(image=img_tk)  # 이미지를 같은 위치에 표시
         img_label.image = img_tk
@@ -41,8 +38,14 @@ def open_contour_find(root):
 
     def find_contour():
         # 이미지 읽어오기
+        nonlocal contour_image_full
         if hasattr(img_label, 'file_path'):
-            img = cv2.imread(img_label.file_path)  # img_label에서 파일 경로를 가져옴
+            img = cv2.imread(img_label.file_path)
+
+            # 이미지가 정상적으로 로드되었는지 확인
+            if img is None:
+                print("이미지를 불러오지 못했습니다. 파일 경로를 확인하세요.")
+                return  # 이미지 로드 실패 시 함수 종료
 
             # 이미지를 grayscale로 변환
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -54,34 +57,33 @@ def open_contour_find(root):
             contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
             # 검은색 배경 이미지 생성
-            contour_img = np.zeros_like(img)  # 윤곽선 이미지를 위한 빈 배열
+            contour_img = np.zeros_like(img)
 
-            # 윤곽선을 검은색으로 그리기
-            cv2.drawContours(contour_img, contours, -1, (255, 255, 255), 2)  # 외곽선 그리기 (흰색)
+            # 윤곽선 그리기
+            cv2.drawContours(contour_img, contours, -1, (255, 255, 255), 2)
 
             # OpenCV 이미지를 PIL로 변환
-            img_rgb = cv2.cvtColor(contour_img, cv2.COLOR_BGR2RGB)  # BGR에서 RGB로 변환
-            img_pil = Image.fromarray(img_rgb)  # numpy 배열을 PIL 이미지로 변환
+            img_rgb = cv2.cvtColor(contour_img, cv2.COLOR_BGR2RGB)
+            contour_image_full = Image.fromarray(img_rgb)  # 원본 크기의 외곽선 이미지를 저장
 
-            # 이미지를 Tkinter의 Label에 표시
-            img_tk = ImageTk.PhotoImage(img_pil)  # PIL 이미지를 Tkinter 이미지로 변환
-            img_label.config(image=img_tk)  # Label에 이미지 설정
-            img_label.image = img_tk  # 가비지 컬렉션 방지를 위한 참조 저장
+            # Tkinter 상에 300x300으로 축소한 이미지 표시
+            contour_thumbnail = contour_image_full.copy()
+            contour_thumbnail.thumbnail((300, 300))  # 300x300 썸네일로 변환
+            img_tk = ImageTk.PhotoImage(contour_thumbnail)
+            img_label.config(image=img_tk)  # Label에 축소된 이미지 설정
+            img_label.image = img_tk  # 가비지 컬렉션 방지
         else:
             print("먼저 이미지를 열어야 합니다.")  # 이미지가 없을 경우 메시지 표시
 
-
-
     def save_image():
-        # 저장 수행
-        if hasattr(img_label, 'file_path'):
+        # 원본 크기의 외곽선 이미지를 저장
+        if contour_image_full is not None:
             file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
             if file_path:
-                output_image = Image.open(img_label.file_path)  # 저장할 이미지 열기
-                output_image.save(file_path)  # 지정된 경로에 저장
-                print("저장 완료")
+                contour_image_full.save(file_path)  # 원본 크기의 이미지 저장
+                print(f"저장 완료: {file_path}")
         else:
-            print("먼저 기능을 수행해야 합니다.")
+            print("먼저 외곽선 추출 기능을 수행해야 합니다.")
 
     # 이미지 열기 버튼
     open_button = tk.Button(new_window, text="이미지 열기", command=open_image)
@@ -97,4 +99,3 @@ def open_contour_find(root):
     # 이미지 저장 버튼
     save_button = tk.Button(button_frame, text="이미지 저장", command=save_image)
     save_button.pack(side="left", padx=10)
-
