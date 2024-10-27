@@ -23,20 +23,22 @@ root.grid_columnconfigure(4, weight=1)
 
 buttons = [
     tk.Button(root, text="이미지 배경 투명화", command=lambda: bg_remove.open_bg_remove(root), width=20, height=2),
-    tk.Button(root, text="이미지 외곽선 추출", command=lambda: contour_find.open_contour_find(root), width = 20, height= 2),
-    tk.Button(root, text="GIF 배경 투명화", command=lambda: gif_bg_remove.open_gif_transparent(root), width = 20, height= 2),
-    tk.Button(root, text="이미지 사이즈 변환", command=lambda: size_change.open_size_change(root), width = 20, height= 2),
-    tk.Button(root, text="다수 이미지 정렬", command=lambda: arrange_img.open_multiple_images(root), width = 20, height= 2),
-    tk.Button(root, text="다수 이미지 합성", command=dummy_function, width = 20, height= 2),
-    tk.Button(root, text="영상 GIF 변환", command=dummy_function, width = 20, height= 2),
-    tk.Button(root, text="종료", command=root.quit, width = 10, height= 1)
+    tk.Button(root, text="이미지 외곽선 추출", command=lambda: contour_find.open_contour_find(root), width=20, height=2),
+    tk.Button(root, text="GIF 배경 투명화", command=lambda: gif_bg_remove.open_gif_transparent(root), width=20, height=2),
+    tk.Button(root, text="이미지 사이즈 변환", command=lambda: size_change.open_size_change(root), width=20, height=2),
+    tk.Button(root, text="다수 이미지 정렬&합성", command=lambda: arrange_img.open_multiple_images(root), width=20, height=2),
+    tk.Button(root, text="영상 GIF 변환", command=dummy_function, width=20, height=2),
 ]
 
-# 2열 4행
+# 2열 3행으로 나누어 버튼 배치
 for i, button in enumerate(buttons):
     row = i // 2 
     column = i % 2 + 1 
     button.grid(row=row, column=column, padx=10, pady=10)
+
+# 종료 버튼 중앙 배치
+exit_button = tk.Button(root, text="종료", command=root.quit, width=10, height=1)
+exit_button.grid(row=3, column=1, columnspan=2)  # 마지막 행 중앙에 위치
 
 # 여백 추가
 root.grid_rowconfigure(1, weight=1)

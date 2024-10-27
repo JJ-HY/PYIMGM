@@ -6,7 +6,7 @@ from rembg import remove  # rembg를 사용하여 배경 제거
 
 def open_gif_transparent(root):
     new_window = Toplevel(root)
-    new_window.title("GIF 배경 제거")
+    new_window.title("PYIMGM")
     new_window.geometry("500x500")
 
     title_label = tk.Label(new_window, text="GIF 배경 제거", font=("bold", 10))

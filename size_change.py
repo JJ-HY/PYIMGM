@@ -5,7 +5,7 @@ import io
 
 def open_size_change(root):
     new_window = Toplevel(root)
-    new_window.title("이미지 크기 변경")
+    new_window.title("PYIMGM")
     new_window.geometry("500x500")
 
     title_label = tk.Label(new_window, text="이미지 크기 변경", font=("bold", 10))
