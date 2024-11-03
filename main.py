@@ -7,6 +7,7 @@ import contour_find
 import gif_bg_remove
 import size_change
 import arrange_img
+import video_gif_change
 
 def dummy_function():
     pass
@@ -27,7 +28,7 @@ buttons = [
     tk.Button(root, text="GIF 배경 투명화", command=lambda: gif_bg_remove.open_gif_transparent(root), width=20, height=2),
     tk.Button(root, text="이미지 사이즈 변환", command=lambda: size_change.open_size_change(root), width=20, height=2),
     tk.Button(root, text="다수 이미지 정렬&합성", command=lambda: arrange_img.open_multiple_images(root), width=20, height=2),
-    tk.Button(root, text="영상 GIF 변환", command=dummy_function, width=20, height=2),
+    tk.Button(root, text="영상 GIF 변환", command=lambda:video_gif_change.open_video_to_gif(root), width=20, height=2),
 ]
 
 # 2열 3행으로 나누어 버튼 배치
