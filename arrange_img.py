@@ -10,16 +10,16 @@ def open_multiple_images(root):
     title_label = tk.Label(new_window, text="이미지 크기 변경", font=("bold", 12))
     title_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
 
-    # 새 창의 레이아웃을 설정 (grid 사용)
-    new_window.grid_rowconfigure(0, weight=0)  # 제목
-    new_window.grid_rowconfigure(1, weight=1)  # 이미지가 중간에 위치
-    new_window.grid_rowconfigure(2, weight=0)  # 버튼이 하단에 위치
-    new_window.grid_columnconfigure(0, weight=1)  # 버튼과 이미지 중앙 정렬
+    # new_window grid
+    new_window.grid_rowconfigure(0, weight=0)  # title
+    new_window.grid_rowconfigure(1, weight=1)  # image
+    new_window.grid_rowconfigure(2, weight=0)  # button
+    new_window.grid_columnconfigure(0, weight=1)  # button
 
     img_display = tk.Label(new_window)
     img_display.grid(row=1, column=0, padx=20, pady=20)
 
-    image_paths = []  # 불러온 이미지 파일 경로 저장
+    image_paths = []
     image_listbox = tk.Listbox(new_window, width=50, height=10)
     image_listbox.grid(row=2, column=0, padx=20, pady=10)
 
@@ -28,7 +28,7 @@ def open_multiple_images(root):
         if file_paths:
             for file_path in file_paths:
                 image_paths.append(file_path)
-                image_listbox.insert(tk.END, file_path.split("/")[-1])  # 파일 이름 추가
+                image_listbox.insert(tk.END, file_path.split("/")[-1])
 
     def resize_images():
         if not image_paths:
@@ -36,7 +36,7 @@ def open_multiple_images(root):
             return
 
         try:
-            target_width = int(size_entry.get())  # 입력된 가로 크기 가져오기
+            target_width = int(size_entry.get())  # get width size
         except ValueError:
             messagebox.showerror("오류", "유효한 숫자를 입력하세요.")
             return
@@ -65,47 +65,52 @@ def open_multiple_images(root):
             messagebox.showwarning("경고", "이미지를 먼저 불러와야 합니다.")
             return
 
-        images = [Image.open(path) for path in image_paths]
+        try:
+            target_width = int(size_entry.get())  # 사용자가 입력한 가로 크기
+        except ValueError:
+            messagebox.showerror("오류", "유효한 숫자를 입력하세요.")
+            return
+
+        # Load and resize images to the specified width
+        images = [Image.open(path).resize((target_width, int(target_width * (Image.open(path).height / Image.open(path).width))), Image.LANCZOS) for path in image_paths]
         total_height = sum(img.height for img in images) + 5 * (len(images) - 1)  # 이미지 높이 총합 + 간격 합
-        max_width = max(img.width for img in images)  # 가장 넓은 이미지의 가로 크기
 
-        # 합성 이미지 생성 (배경색을 흰색으로 설정)
-        concatenated_img = Image.new("RGB", (max_width, total_height), (255, 255, 255))
+        # Create new image with white background
+        concatenated_img = Image.new("RGB", (target_width, total_height), (255, 255, 255))
 
-        # 이미지들을 세로로 붙이기
+        # Paste images vertically
         y_offset = 0
         for img in images:
             concatenated_img.paste(img, (0, y_offset))  # 이미지 붙이기
             y_offset += img.height + 5  # 현재 이미지 높이 + 간격을 더해 다음 위치 계산
 
-        # 합성된 이미지 저장
+        # Save concatenated image
         save_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")],
                                                  initialfile="concatenated_image.png")
         if save_path:
             concatenated_img.save(save_path)
             print(f"합성 이미지 저장 완료: {save_path}")
 
-    # 이미지 열기 버튼
     open_button = tk.Button(new_window, text="이미지 열기", command=load_images)
     open_button.grid(row=0, column=0, pady=10)
 
-    # 가로 크기 입력 필드
+    # width input 
     size_entry = tk.Entry(new_window)
     size_entry.grid(row=3, column=0, padx=10, pady=10)
-    size_entry.insert(0, "가로 크기 입력")  # 기본 텍스트 설정
+    size_entry.insert(0, "가로 크기 입력")
 
-    # 버튼을 배치할 프레임 생성
+    # frame
     button_frame = tk.Frame(new_window)
     button_frame.grid(row=4, column=0, pady=20)
 
-    # 사이즈 변경 버튼
+    # resize_button
     resize_button = tk.Button(button_frame, text="사이즈 변경", command=resize_images)
     resize_button.pack(side="left", padx=10)
 
-    # 여러 이미지 합성 버튼 - 새로 만든 concatenate_images 함수에 연결
+    # concatenate_images
     open_images_button = tk.Button(button_frame, text="여러 이미지 합성", command=concatenate_images)
     open_images_button.pack(side="left", padx=10)
 
-    # 이미지 저장 버튼
+    # save
     save_button = tk.Button(button_frame, text="이미지 저장", command=resize_images)
     save_button.pack(side="left", padx=10)

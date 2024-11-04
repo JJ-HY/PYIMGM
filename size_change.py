@@ -11,11 +11,11 @@ def open_size_change(root):
     title_label = tk.Label(new_window, text="이미지 크기 변경", font=("bold", 10))
     title_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
 
-    # 새 창의 레이아웃을 설정 (grid 사용)
-    new_window.grid_rowconfigure(0, weight=0)  # 제목
-    new_window.grid_rowconfigure(1, weight=1)  # 이미지가 중간에 위치
-    new_window.grid_rowconfigure(2, weight=0)  # 버튼이 하단에 위치
-    new_window.grid_columnconfigure(0, weight=1)  # 버튼과 이미지 중앙 정렬
+    # new_window grid
+    new_window.grid_rowconfigure(0, weight=0)  # title
+    new_window.grid_rowconfigure(1, weight=1)  # image
+    new_window.grid_rowconfigure(2, weight=0)  # button
+    new_window.grid_columnconfigure(0, weight=1)  # button
 
     # 이미지 라벨을 새 창에서 초기화 (이미지가 표시될 자리)
     img_label = tk.Label(new_window)
@@ -55,14 +55,14 @@ def open_size_change(root):
             
             img_label.config(image=resized_img_tk)  # 같은 위치에서 결과 이미지 표시
             img_label.image = resized_img_tk
+            img_label.output_image = resized_image  # 리사이즈된 이미지를 저장
 
     def save_image():
         # 저장 수행
-        if hasattr(img_label, 'file_path'):
+        if hasattr(img_label, 'output_image'):
             file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
             if file_path:
-                output_image = Image.open(img_label.file_path)  # 저장할 이미지 열기
-                output_image.save(file_path)  # 지정된 경로에 저장
+                img_label.output_image.save(file_path)  # 리사이즈된 이미지 저장
                 print("저장 완료")
         else:
             print("먼저 이미지를 열어야 합니다.")  # 이미지가 없을 경우 처리
